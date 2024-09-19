@@ -37,11 +37,16 @@ int main() {
 
     file.close(); // Close the file
 
-    // Print out the student information
+#ifdef _DEBUG
+    // Print all student information for debugging
     std::cout << "Students List:" << std::endl;
     for (const auto& student : students) {
         std::cout << "Name: " << student.lastName << ", " << student.firstName << std::endl;
     }
+#else
+    // In release mode, just mention running status
+    std::cout << "Running in release mode. No debug information available." << std::endl;
+#endif
 
     return 0;
 }
