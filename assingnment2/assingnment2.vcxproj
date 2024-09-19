@@ -129,6 +129,10 @@
   <ItemGroup>
     <ClCompile Include="asn2.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\Asn2\Asn2\StudentData.txt" />
+    <Text Include="..\..\Asn2\Asn2\StudentData_Emails.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
