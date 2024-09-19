@@ -4,15 +4,25 @@
 #include <vector>
 #include <string>
 
-// Define the STUDENT_DATA struct
 struct STUDENT_DATA {
     std::string firstName;
     std::string lastName;
+    std::string email;  // Added for pre-release mode
 };
 
 int main() {
-    std::vector<STUDENT_DATA> students; // Vector to store student data
-    std::ifstream file("StudentData.txt"); // Open the input file
+    std::vector<STUDENT_DATA> students;
+    std::ifstream file;
+
+#ifdef PRE_RELEASE
+    // Indicate that the application is running in pre-release mode
+    std::cout << "Running in Pre-Release mode." << std::endl;
+    file.open("StudentData_Emails.txt");  // Open the pre-release input file
+#else
+    // Indicate that the application is running in standard mode
+    std::cout << "Running in Standard mode." << std::endl;
+    file.open("StudentData.txt");  // Open the standard input file
+#endif
 
     if (!file.is_open()) {
         std::cerr << "Error opening file." << std::endl;
@@ -20,32 +30,69 @@ int main() {
     }
 
     std::string line;
-    // Read each line from the file
     while (std::getline(file, line)) {
         std::istringstream ss(line);
         STUDENT_DATA student;
 
-        // Parse the last name and first name
-        if (std::getline(ss, student.lastName, ',') && std::getline(ss, student.firstName)) {
-            // Create a student object and push it into the vector
+#ifdef PRE_RELEASE
+        // In pre-release mode, expect last name, first name, and email
+        if (std::getline(ss, student.lastName, ',') &&
+            std::getline(ss, student.firstName, ',') &&
+            std::getline(ss, student.email)) {
             students.push_back(student);
         }
         else {
             std::cerr << "Error reading line: " << line << std::endl;
         }
+#else
+        // In standard mode, expect last name and first name
+        if (std::getline(ss, student.lastName, ',') &&
+            std::getline(ss, student.firstName)) {
+            students.push_back(student);
+        }
+        else {
+            std::cerr << "Error reading line: " << line << std::endl;
+        }
+#endif
     }
 
-    file.close(); // Close the file
+    file.close();  // Close the file
 
 #ifdef _DEBUG
-    // Print all student information for debugging
-    std::cout << "Students List:" << std::endl;
-    for (const auto& student : students) {
-        std::cout << "Name: " << student.lastName << ", " << student.firstName << std::endl;
+    // Debug output
+    if (students.empty()) {
+        std::cout << "No students found." << std::endl;
+    }
+    else {
+        for (const auto& student : students) {
+#ifdef PRE_RELEASE
+            std::cout << "Name: " << student.lastName << ", "
+                << student.firstName << ", Email: "
+                << student.email << std::endl;
+#else
+            std::cout << "Name: " << student.lastName << ", "
+                << student.firstName << std::endl;
+#endif
+        }
     }
 #else
-    // In release mode, just mention running status
-    std::cout << "Running in release mode. No debug information available." << std::endl;
+    // Release output
+    if (students.empty()) {
+        std::cout << "No students found." << std::endl;
+    }
+    else {
+        if (students.size() > 0) {
+#ifdef PRE_RELEASE
+            // In pre-release mode, print only emails
+            for (const auto& student : students) {
+                std::cout << "Email: " << student.email << std::endl;
+            }
+#else
+            // In standard release mode, just mention running status
+            std::cout << "Just running in Standard mode." << std::endl;
+#endif
+        }
+    }
 #endif
 
     return 0;
